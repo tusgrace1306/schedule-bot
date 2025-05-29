@@ -23,21 +23,29 @@ client.once('ready', () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
 });
 
+function buildButtonRows() {
+  const rows = [];
+  for (let i = 0; i < dutyList.length; i += 5) {
+    const row = new ActionRowBuilder();
+    row.addComponents(
+      ...dutyList.slice(i, i + 5).map((name, index) =>
+        new ButtonBuilder()
+          .setCustomId(`choose_${i + index}`)
+          .setLabel(name)
+          .setStyle(ButtonStyle.Primary)
+      )
+    );
+    rows.push(row);
+  }
+  return rows;
+}
+
 async function remindDuty() {
   try {
     const owner = await client.users.fetch(ownerId);
     if (!owner) return console.error("❌ Không tìm thấy owner");
 
-    const components = [
-      new ActionRowBuilder().addComponents(
-        ...dutyList.map((name, index) =>
-          new ButtonBuilder()
-            .setCustomId(`choose_${index}`)
-            .setLabel(name)
-            .setStyle(ButtonStyle.Primary)
-        )
-      )
-    ];
+    const components = buildButtonRows();
 
     const dmChannel = await owner.createDM();
     const message = await dmChannel.send({
@@ -105,7 +113,7 @@ client.on('interactionCreate', async interaction => {
 const rule = new schedule.RecurrenceRule();
 rule.tz = 'Asia/Ho_Chi_Minh';
 rule.hour = 17;
-rule.minute = 10;
+rule.minute = 15;
 
 schedule.scheduleJob(rule, remindDuty);
 
