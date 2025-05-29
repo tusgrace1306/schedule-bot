@@ -24,26 +24,33 @@ client.once('ready', () => {
 });
 
 async function remindDuty() {
-  const channel = await client.channels.fetch(channelId);
-  if (!channel) return console.error('❌ Không tìm thấy channel Discord');
+  try {
+    const owner = await client.users.fetch(ownerId);
+    if (!owner) return console.error("❌ Không tìm thấy owner");
 
-  const components = [
-    new ActionRowBuilder().addComponents(
-      ...dutyList.map((name, index) =>
-        new ButtonBuilder()
-          .setCustomId(`choose_${index}`)
-          .setLabel(name)
-          .setStyle(ButtonStyle.Primary)
+    const components = [
+      new ActionRowBuilder().addComponents(
+        ...dutyList.map((name, index) =>
+          new ButtonBuilder()
+            .setCustomId(`choose_${index}`)
+            .setLabel(name)
+            .setStyle(ButtonStyle.Primary)
+        )
       )
-    )
-  ];
+    ];
 
-  const message = await channel.send({
-    content: `<@${ownerId}> 🕓 Đến giờ chọn người trực nhật hôm nay.`,
-    components,
-  });
+    const dmChannel = await owner.createDM();
+    const message = await dmChannel.send({
+      content: `🕓 Đến giờ chọn người trực nhật hôm nay.`,
+      components,
+    });
 
-  currentDutyMessageId = message.id;
+    currentDutyMessageId = message.id;
+
+    console.log("✅ Đã gửi DM nhắc owner chọn người trực");
+  } catch (err) {
+    console.error("❌ Lỗi khi gửi DM cho owner:", err);
+  }
 }
 
 client.on('interactionCreate', async interaction => {
@@ -98,7 +105,7 @@ client.on('interactionCreate', async interaction => {
 const rule = new schedule.RecurrenceRule();
 rule.tz = 'Asia/Ho_Chi_Minh';
 rule.hour = 17;
-rule.minute = 5;
+rule.minute = 10;
 
 schedule.scheduleJob(rule, remindDuty);
 
