@@ -1,4 +1,4 @@
-require('dotenv').config();
+// require('dotenv').config();
 const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const schedule = require('node-schedule');
 const moment = require('moment-timezone');
