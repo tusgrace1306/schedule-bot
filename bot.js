@@ -120,7 +120,7 @@ client.on('interactionCreate', async interaction => {
 const rule = new schedule.RecurrenceRule();
 rule.tz = 'Asia/Ho_Chi_Minh';
 rule.hour = 17;
-rule.minute = 19;
+rule.minute = 0;
 
 schedule.scheduleJob(rule, remindDuty);
 
