@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
     "moment-timezone": "^0.5.48",
     "node-schedule": "^2.1.1",
