@@ -70,10 +70,10 @@ client.on('interactionCreate', async interaction => {
     if (user.id !== ownerId) {
       return interaction.reply({ content: '🚫 Chỉ owner được chọn người trực.', ephemeral: true });
     }
-
+  
     const index = parseInt(customId.split('_')[1]);
     currentDuty = { name: dutyList[index] };
-
+  
     const confirmRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('done')
@@ -84,14 +84,21 @@ client.on('interactionCreate', async interaction => {
         .setLabel('❌ Vắng mặt')
         .setStyle(ButtonStyle.Danger),
     );
-
-    const dutyMsg = await interaction.channel.send({
-      content: `📢 Hôm nay đến lượt **${currentDuty.name}** trực nhật!\nNhớ thay túi rác, nếu là thứ 6 hãy tưới cây nhé 🌿`,
-      components: [confirmRow],
-    });
-
-    currentDutyMessageId = dutyMsg.id;
-    await interaction.update({ content: `✅ Đã chọn ${currentDuty.name}`, components: [] });
+  
+    try {
+      const dutyChannel = await client.channels.fetch(channelId); // 👈 lấy lại channel gốc
+  
+      const dutyMsg = await dutyChannel.send({
+        content: `📢 Hôm nay đến lượt **${currentDuty.name}** trực nhật!\nNhớ thay túi rác, nếu là thứ 6 hãy tưới cây nhé 🌿`,
+        components: [confirmRow],
+      });
+  
+      currentDutyMessageId = dutyMsg.id;
+      await interaction.update({ content: `✅ Đã chọn ${currentDuty.name}`, components: [] });
+    } catch (err) {
+      console.error("❌ Không gửi được thông báo vào nhóm:", err);
+      await interaction.reply({ content: '❌ Gửi thông báo thất bại.', ephemeral: true });
+    }
   }
 
   if (customId === 'done' || customId === 'vang') {
@@ -113,7 +120,7 @@ client.on('interactionCreate', async interaction => {
 const rule = new schedule.RecurrenceRule();
 rule.tz = 'Asia/Ho_Chi_Minh';
 rule.hour = 17;
-rule.minute = 15;
+rule.minute = 19;
 
 schedule.scheduleJob(rule, remindDuty);
 
